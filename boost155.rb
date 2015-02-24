@@ -1,4 +1,4 @@
-require "formula"
+
 
 class UniversalPython < Requirement
   satisfy(:build_env => false) { archs_for_command("python").universal? }
@@ -28,17 +28,6 @@ class Boost155 < Formula
   homepage "http://www.boost.org"
   url "https://downloads.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.bz2"
   sha1 "cef9a0cc7084b1d639e06cd3bc34e4251524c840"
-  revision 2
-
-  head "https://github.com/boostorg/boost.git"
-
-  bottle do
-    cellar :any
-    revision 4
-    sha1 "81b8843487a6f0017fac77b4bf58bdc20f3298fa" => :mavericks
-    sha1 "40089f76eddb25ac418032fa0055b6f0b6d76847" => :mountain_lion
-    sha1 "da4fb2a221fd83f50741f757eefe4bc38b5e910c" => :lion
-  end
 
   env :userpaths
 
@@ -113,7 +102,7 @@ class Boost155 < Formula
   def install
     # https://svn.boost.org/trac/boost/ticket/8841
     if build.with? "mpi" and build.with? "single"
-      raise <<-EOS.undent
+      fail <<-EOS.undent
         Building MPI support for both single and multi-threaded flavors
         is not supported.  Please use "--with-mpi" together with
         "--without-single".
@@ -122,7 +111,7 @@ class Boost155 < Formula
 
     if build.cxx11? and build.with? "mpi" and (build.with? "python" \
                                                or build.with? "python3")
-      raise <<-EOS.undent
+      fail <<-EOS.undent
         Building MPI support for Python using C++11 mode results in
         failure and hence disabled.  Please don"t use this combination
         of options.
@@ -176,8 +165,8 @@ class Boost155 < Formula
     # Boost.Log cannot be built using Apple GCC at the moment. Disabled
     # on such systems.
     without_libraries << "log" if ENV.compiler == :gcc || ENV.compiler == :llvm
-    without_libraries << "python" if (build.without? "python" \
-                                      and build.without? "python3")
+    without_libraries << "python" if build.without? "python" \
+                                      and build.without? "python3"
     without_libraries << "mpi" if build.without? "mpi"
 
     bargs << "--without-libraries=#{without_libraries.join(",")}"

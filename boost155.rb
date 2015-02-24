@@ -1,4 +1,4 @@
-require 'formula'
+require "formula"
 
 class UniversalPython < Requirement
   satisfy(:build_env => false) { archs_for_command("python").universal? }
@@ -25,12 +25,12 @@ class UniversalPython3 < Requirement
 end
 
 class Boost155 < Formula
-  homepage 'http://www.boost.org'
-  url 'https://downloads.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.bz2'
-  sha1 'cef9a0cc7084b1d639e06cd3bc34e4251524c840'
+  homepage "http://www.boost.org"
+  url "https://downloads.sourceforge.net/project/boost/boost/1.55.0/boost_1_55_0.tar.bz2"
+  sha1 "cef9a0cc7084b1d639e06cd3bc34e4251524c840"
   revision 2
 
-  head 'https://github.com/boostorg/boost.git'
+  head "https://github.com/boostorg/boost.git"
 
   bottle do
     cellar :any
@@ -43,10 +43,10 @@ class Boost155 < Formula
   env :userpaths
 
   option :universal
-  option 'with-icu', 'Build regexp engine with icu support'
-  option 'without-single', 'Disable building single-threading variant'
-  option 'without-static', 'Disable building static library variant'
-  option 'with-mpi', 'Build with MPI support'
+  option "with-icu", "Build regexp engine with icu support"
+  option "without-single", "Disable building single-threading variant"
+  option "without-static", "Disable building static library variant"
+  option "with-mpi", "Build with MPI support"
   option :cxx11
 
   depends_on :python => :optional
@@ -58,17 +58,17 @@ class Boost155 < Formula
     odie "boost155: --with-python3 cannot be specified when using --with-python"
   end
 
-  if build.with? 'icu'
+  if build.with? "icu"
     if build.cxx11?
-      depends_on 'icu4c' => 'c++11'
+      depends_on "icu4c" => "c++11"
     else
-      depends_on 'icu4c'
+      depends_on "icu4c"
     end
   end
 
-  if build.with? 'mpi'
+  if build.with? "mpi"
     if build.cxx11?
-      depends_on 'open-mpi' => 'c++11'
+      depends_on "open-mpi" => "c++11"
     else
       depends_on :mpi => [:cc, :cxx, :optional]
     end
@@ -112,19 +112,19 @@ class Boost155 < Formula
 
   def install
     # https://svn.boost.org/trac/boost/ticket/8841
-    if build.with? 'mpi' and build.with? 'single'
+    if build.with? "mpi" and build.with? "single"
       raise <<-EOS.undent
         Building MPI support for both single and multi-threaded flavors
-        is not supported.  Please use '--with-mpi' together with
-        '--without-single'.
+        is not supported.  Please use "--with-mpi" together with
+        "--without-single".
       EOS
     end
 
-    if build.cxx11? and build.with? 'mpi' and (build.with? 'python' \
-                                               or build.with? 'python3')
+    if build.cxx11? and build.with? "mpi" and (build.with? "python" \
+                                               or build.with? "python3")
       raise <<-EOS.undent
         Building MPI support for Python using C++11 mode results in
-        failure and hence disabled.  Please don't use this combination
+        failure and hence disabled.  Please don"t use this combination
         of options.
       EOS
     end
@@ -134,10 +134,10 @@ class Boost155 < Formula
     # Force boost to compile using the appropriate GCC version.
     open("user-config.jam", "a") do |file|
       file.write "using darwin : : #{ENV.cxx} ;\n"
-      file.write "using mpi ;\n" if build.with? 'mpi'
+      file.write "using mpi ;\n" if build.with? "mpi"
 
       # Link against correct version of Python if python3 build was requested
-      if build.with? 'python3'
+      if build.with? "python3"
         py3executable = `which python3`.strip
         py3version = `python3 -c "import sys; print(sys.version[:3])"`.strip
         py3prefix = `python3 -c "import sys; print(sys.prefix)"`.strip
@@ -154,18 +154,18 @@ class Boost155 < Formula
     # we specify libdir too because the script is apparently broken
     bargs = ["--prefix=#{prefix}", "--libdir=#{lib}"]
 
-    if build.with? 'icu'
-      icu4c_prefix = Formula['icu4c'].opt_prefix
+    if build.with? "icu"
+      icu4c_prefix = Formula["icu4c"].opt_prefix
       bargs << "--with-icu=#{icu4c_prefix}"
     else
-      bargs << '--without-icu'
+      bargs << "--without-icu"
     end
 
     # Handle libraries that will not be built.
     without_libraries = []
 
     # The context library is implemented as x86_64 ASM, so it
-    # won't build on PPC or 32-bit builds
+    # won"t build on PPC or 32-bit builds
     # see https://github.com/Homebrew/homebrew/issues/17646
     if Hardware::CPU.ppc? || Hardware::CPU.is_32_bit? || build.universal?
       without_libraries << "context"
@@ -176,11 +176,11 @@ class Boost155 < Formula
     # Boost.Log cannot be built using Apple GCC at the moment. Disabled
     # on such systems.
     without_libraries << "log" if ENV.compiler == :gcc || ENV.compiler == :llvm
-    without_libraries << "python" if (build.without? 'python' \
-                                      and build.without? 'python3')
-    without_libraries << "mpi" if build.without? 'mpi'
+    without_libraries << "python" if (build.without? "python" \
+                                      and build.without? "python3")
+    without_libraries << "mpi" if build.without? "mpi"
 
-    bargs << "--without-libraries=#{without_libraries.join(',')}"
+    bargs << "--without-libraries=#{without_libraries.join(",")}"
 
     args = ["--prefix=#{prefix}",
             "--libdir=#{lib}",
@@ -218,8 +218,8 @@ class Boost155 < Formula
   end
 
   def caveats
-    s = ''
-    # ENV.compiler doesn't exist in caveats. Check library availability
+    s = ""
+    # ENV.compiler doesn"t exist in caveats. Check library availability
     # instead.
     if Dir["#{lib}/libboost_log*"].empty?
       s += <<-EOS.undent

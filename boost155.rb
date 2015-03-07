@@ -1,5 +1,4 @@
 
-
 class UniversalPython < Requirement
   satisfy(:build_env => false) { archs_for_command("python").universal? }
 

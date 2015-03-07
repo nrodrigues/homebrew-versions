@@ -227,4 +227,31 @@ class Boost155 < Formula
 
     s
   end
+
+  test do
+    (testpath/"test.cpp").write <<-EOS.undent
+      #include <boost/algorithm/string.hpp>
+      #include <boost/version.hpp>
+      #include <string>
+      #include <vector>
+      #include <assert.h>
+      using namespace boost::algorithm;
+      using namespace std;
+      int main()
+      {
+        string str("a,b");
+        vector<string> strVec;
+        split(strVec, str, is_any_of(","));
+        assert(strVec.size()==2);
+        assert(strVec[0]=="a");
+        assert(strVec[1]=="b");
+
+        assert(strcmp(BOOST_LIB_VERSION, "1_55") == 0);
+
+        return 0;
+      }
+    EOS
+    system ENV.cxx, "test.cpp", "-std=c++1y", "-lboost_system", "-o", "test"
+    system "./test"
+  end
 end

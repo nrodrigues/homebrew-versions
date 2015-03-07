@@ -40,8 +40,8 @@ class Boost155 < Formula
 
   depends_on :python => :optional
   depends_on :python3 => :optional
-  depends_on UniversalPython if build.universal? and build.with? "python"
-  depends_on UniversalPython3 if build.universal? and build.with? "python3"
+  depends_on UniversalPython if build.universal? && build.with?("python")
+  depends_on UniversalPython3 if build.universal? && build.with?("python3")
 
   if build.with?("python3") && build.with?("python")
     odie "boost155: --with-python3 cannot be specified when using --with-python"
@@ -101,7 +101,7 @@ class Boost155 < Formula
 
   def install
     # https://svn.boost.org/trac/boost/ticket/8841
-    if build.with? "mpi" and build.with? "single"
+    if build.with?("mpi") && build.with?("single")
       fail <<-EOS.undent
         Building MPI support for both single and multi-threaded flavors
         is not supported.  Please use "--with-mpi" together with
@@ -109,8 +109,8 @@ class Boost155 < Formula
       EOS
     end
 
-    if build.cxx11? and build.with? "mpi" and (build.with? "python" \
-                                               or build.with? "python3")
+    if build.cxx11? && build.with?("mpi") && (build.with?("python") \
+                                               || build.with?("python3"))
       fail <<-EOS.undent
         Building MPI support for Python using C++11 mode results in
         failure and hence disabled.  Please don"t use this combination
@@ -165,8 +165,8 @@ class Boost155 < Formula
     # Boost.Log cannot be built using Apple GCC at the moment. Disabled
     # on such systems.
     without_libraries << "log" if ENV.compiler == :gcc || ENV.compiler == :llvm
-    without_libraries << "python" if build.without? "python" \
-                                      and build.without? "python3"
+    without_libraries << "python" if build.without?("python") \
+                                      && build.without?("python3")
     without_libraries << "mpi" if build.without? "mpi"
 
     bargs << "--without-libraries=#{without_libraries.join(",")}"
